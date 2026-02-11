@@ -8,108 +8,13 @@ import ProductCard from "../../components/manager/ProductCard.jsx";
 import EditProduct from "../../components/manager/EditProduct.jsx";
 import { AnimatePresence } from "framer-motion";
 import Popup from "../../components/Popup.jsx";
+import { useApi } from "../../../functions/api/api.js";
 
 export default function Product() {
 
-    const [products, setProducts] = useState([
-        {
-            id: 1,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 2400.786,
-            img: "/placeholder/grilled.png",
-            category: "starters"
-        },
-        {
-            id: 2,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 716.99,
-            img: "/placeholder/margarita.png",
-            category: "starters"
-        },
-        {
-            id: 3,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 618.99,
-            img: "/placeholder/burger.png",
-            category: "starters"
-        },
-        {
-            id: 4,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 78.99,
-            img: "/placeholder/lava.png",
-            category: "main dishes"
-        },
-        {
-            id: 6,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 176.99,
-            img: "/placeholder/margarita.png",
-            category: "main dishes"
-        },
-        {
-            id: 7,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 718.99,
-            img: "/placeholder/burger.png",
-            category: "main dishes"
-        },
-        {
-            id: 5,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 247.99,
-            img: "/placeholder/grilled.png",
-            category: "desserts"
-        },
-        {
-            id: 8,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 78.99,
-            img: "/placeholder/lava.png",
-            category: "desserts"
-        },
-        {
-            id: 10,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 716.99,
-            img: "/placeholder/margarita.png",
-            category: "desserts"
-        },
-        {
-            id: 9,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 274.99,
-            img: "/placeholder/grilled.png",
-            category: "drinks",
-        },
-        {
-            id: 12,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 87.99,
-            img: "/placeholder/lava.png",
-            category: "drinks",
-        },
-        {
-            id: 11,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 718.99,
-            img: "/placeholder/burger.png",
-            category: "drinks",
-        },
-    ]);
-    const [loading, setLoading] = useState(!true);
+    const { request } = useApi();
+    const [products, setProducts] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState(null);
     const [editProduct, setEditProduct] = useState({
         name: "",
@@ -119,6 +24,10 @@ export default function Product() {
         category: "",
     });
     const [openEdit, setOpenEdit] = useState(false);
+
+    useEffect(() => {
+        get_products();
+    }, []);
 
     useEffect(() => {
         if (openEdit)
@@ -131,6 +40,15 @@ export default function Product() {
     const get_products = async () => {
         if (loading===true) return;
         setLoading(true);
+        const req = await request("/manager/get-product");
+        const res = await req.json();
+        if (!req.ok || req.error) {
+            setMsg({msg:res.msg || req.error, type:"error"});
+            setLoading(false);
+        } else {
+            setProducts(res.product);
+            setLoading(false);
+        };
     };
 
     return (
@@ -157,13 +75,13 @@ export default function Product() {
                             <h1 className={'text-sm'}>Add new Dish</h1>
                         </div>
                         {
-                            products.map(p => (
+                            products && products.map(p => (
                                 <ProductCard key={p.id} product={p} setEditProduct={setEditProduct} setOpenEdit={setOpenEdit} />
                             ))
                         }
                         <AnimatePresence mode={'wait'}>
                             { openEdit &&
-                                    <EditProduct product={editProduct} setOpenEdit={setOpenEdit} setMsg={setMsg} />
+                                    <EditProduct product={editProduct} setOpenEdit={setOpenEdit} setMsg={setMsg} get_product={get_products} />
                             }
                         </AnimatePresence>
                         <AnimatePresence mode="wait">

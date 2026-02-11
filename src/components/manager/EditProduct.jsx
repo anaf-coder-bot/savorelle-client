@@ -3,7 +3,7 @@ import {useState} from "react";
 import Loading2 from "../Loading2.jsx";
 import { useApi } from "../../../functions/api/api.js";
 
-export default function EditProduct({ product, setOpenEdit, setMsg }) {
+export default function EditProduct({ product, setOpenEdit, setMsg, get_product }) {
     const { request } = useApi();
 
     const [data, setData] = useState({
@@ -22,18 +22,19 @@ export default function EditProduct({ product, setOpenEdit, setMsg }) {
 
     const submit_form = async (e) => {
         e.preventDefault();
-        console.log(product.category)
+
         if (!data.name || !data.price || !data.img || !data.category || loading) return;
         setLoading(true);
         const req = await request("/manager/add-product", {method: "POST", body: JSON.stringify(data)});
         const res = await req.json();
 
-        if (req.error || req.status!==200) {
+        if (req.error || !req.ok) {
             setMsg({msg: req.error||res.msg, type:"error"});
             setLoading(false);
         } else {
             setMsg({msg: res.msg});
-            setOpenEdit(false);   
+            setOpenEdit(false);
+            get_product(); 
         };
     };
 
