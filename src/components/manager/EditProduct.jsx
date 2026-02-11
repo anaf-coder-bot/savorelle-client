@@ -7,6 +7,7 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
     const { request } = useApi();
 
     const [data, setData] = useState({
+        id: product.id,
         name: product.name,
         description: product.description,
         price: product.price,
@@ -22,11 +23,17 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
 
     const submit_form = async (e) => {
         e.preventDefault();
-
+        
         if (!data.name || !data.price || !data.img || !data.category || loading) return;
         setLoading(true);
-        const req = await request("/manager/add-product", {method: "POST", body: JSON.stringify(data)});
-        const res = await req.json();
+        
+        let req;
+        if (!product.name)
+            req = await handle_add();
+        else
+            req = await handle_edit();
+
+        const res = !req.error && await req.json();
 
         if (req.error || !req.ok) {
             setMsg({msg: req.error||res.msg, type:"error"});
@@ -37,6 +44,10 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
             get_product(); 
         };
     };
+
+    const handle_add = async () => await request("/manager/add-product", {method: "POST", body: JSON.stringify(data)});
+
+    const handle_edit = async () => await request("/manager/edit-product", {method: "POST", body: JSON.stringify(data)});
 
    return (
        <motion.div

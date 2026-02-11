@@ -4,6 +4,7 @@ export default function ProductCard({ product, setEditProduct, setOpenEdit }) {
 
     const do_edit = () => {
         setEditProduct({
+            id: product.id,
             name: product.name,
             description: product.description,
             price: product.price,
@@ -21,7 +22,7 @@ export default function ProductCard({ product, setEditProduct, setOpenEdit }) {
                 className={'w-50'}
                 draggable={false}
             />
-            <h1 className={'font-bold text-xl'}>{product.name}</h1>
+            <h1 className={'font-bold text-xl capitalize text-center'}>{product.name}</h1>
             <h1 className={'text-sm text-gray-400 text-center line-clamp-1'}>{product.description}</h1>
             <h1>{product.price} ETB</h1>
             <button className={'flex items-center justify-center gap-2 w-full bg-yellow-300 h-20 cursor-pointer'} onClick={do_edit}>

@@ -6,117 +6,19 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
+import { useApi } from "../../../functions/api/api.js";
 
 export default function Menus() {
     const navigate = useNavigate();
-    const menus = [
-        {
-            id: 1,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 2400.786,
-            img: "/placeholder/grilled.png",
-            category: "starters"
-        },
-        {
-            id: 2,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 716.99,
-            img: "/placeholder/margarita.png",
-            category: "starters"
-        },
-        {
-            id: 3,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 618.99,
-            img: "/placeholder/burger.png",
-            category: "starters"
-        },
-        {
-            id: 4,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 78.99,
-            img: "/placeholder/lava.png",
-            category: "main dishes"
-        },
-        {
-            id: 6,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 176.99,
-            img: "/placeholder/margarita.png",
-            category: "main dishes"
-        },
-        {
-            id: 7,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 718.99,
-            img: "/placeholder/burger.png",
-            category: "main dishes"
-        },
-        {
-            id: 5,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 247.99,
-            img: "/placeholder/grilled.png",
-            category: "desserts"
-        },
-        {
-            id: 8,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 78.99,
-            img: "/placeholder/lava.png",
-            category: "desserts"
-        },
-        {
-            id: 10,
-            name: "Margherita Pizza",
-            description:"Classic Italian pizza with fresh mozzarella, basil, and San Marzano tomato sauce",
-            price: 716.99,
-            img: "/placeholder/margarita.png",
-            category: "messerts"
-        },
-        {
-            id: 9,
-            name: "Grilled Salmon",
-            description:"Fresh Atlantic salmon with herbs, served with roasted vegetables and lemon butter sauce",
-            price: 274.99,
-            img: "/placeholder/grilled.png",
-            category: "drinks",
-        },
-        {
-            id: 12,
-            name: "Chocolate Lava Cake",
-            description:"Warm chocolate cake with molten center, served with vanilla ice cream",
-            price: 87.99,
-            img: "/placeholder/lava.png",
-            category: "drinks",
-        },
-        {
-            id: 11,
-            name: "Beef Burger",
-            description:"Angus beef patty with cheddar cheese, lettuce, tomato, and special sauce on brioche bun",
-            price: 718.99,
-            img: "/placeholder/burger.png",
-            category: "drinks",
-        },
-    ];
-
+    const { request } = useApi();
+    
+    const [menus, setMenus] = useState(null);
     const [table, setTable] = useState(null);
-
-    // MUST DELETE AFTER BACKEND
-    // Cookies.set("table", JSON.stringify({table_no:1234, table_id:"1234"}), {expires:1})
     
     const [cartNo, setCartNo] = useState(null);
     const [doCartCheck, setDoCartCheck] = useState(false);
     const [fetchText, setFetchText] = useState("");
-    const [loading, setLoading] = useState(!true);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const cart_cookie = Cookies.get("cart");
@@ -126,8 +28,24 @@ export default function Menus() {
     useEffect(() => {
         const table_cookie = Cookies.get("table");
         setTable(table_cookie?JSON.parse(table_cookie):null);
+        get_menus();
     }, []);
 
+    const get_menus = async () => {
+        if (loading) return;
+        setLoading(true)
+        setFetchText("");
+        const req = await request("/customer/get-product");
+        
+        const res = !req.error &&  await req.json();
+        if (req.error || !req.ok) {
+            setFetchText(req.error||res.msg);
+            setLoading(false);
+        } else {
+            setMenus(res.product);
+            setLoading(false);
+        };
+    };
 
     return (
         <div className="min-h-screen bg-[url(/base/bg-gray-1.jpg)] selection:bg-green-400 selection:text-black pb-2 px-2" style={{overflowX:"hidden"}}>
@@ -146,13 +64,18 @@ export default function Menus() {
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-10 pt-25 px-2 md:px-10">
+                    <div className={`${menus && menus.length > 0 ? 'grid grid-cols-2 md:grid-cols-4 gap-10' : ''} pt-25 px-2 md:px-10`}>
                         {
-                            menus.length>0 ? (
+                            menus && menus.length>0 ? (
                                 menus.map((m, index) => (
                                     <MenusCard key={m.id} menu={m} index={index} setDoCartCheck={setDoCartCheck}/>
                                 ))
-                            ) : <h1 className="text-2xl text-center col-span-full text-yellow-500">{fetchText}</h1>
+                            ) : (
+                                <div className="flex flex-col items-center gap-5">
+                                    <h1 className="text-2xl text-center col-span-full text-yellow-500">{fetchText}</h1>
+                                    <button className="bg-yellow-400 text-black p-3 w-1/3 rounded-full cursor-pointer" onClick={get_menus}>Try again</button>
+                                </div>
+                            )
                         }
                     </div>
                     {cartNo && (

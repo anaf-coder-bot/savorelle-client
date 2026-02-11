@@ -37,13 +37,13 @@ export default function MenusCard({menu, index, setDoCartCheck}) {
             <img 
                 src={menu.img} 
                 alt={menu.name} 
-                className="absolute w-40 -top-15 left-1/2 -translate-x-1/2 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] group-hover:rotate-45 duration-300"
+                className="absolute w-40 h-40 rounded-full -top-25 left-1/2 -translate-x-1/2 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] group-hover:rotate-45 duration-300"
                 draggable={false}
             />
             <h1 className="text-white font-bold line-clamp-2 text-center">{menu.name}</h1>
             <h1 className="text-gray-400 text-sm text-center line-clamp-2">{menu.description}</h1>
             <div className="relative flex flex-col items-start justify-between w-full pl-4">
-                <h1 className="text-lg text-green-400">{formatMoney(menu.price)} ETB</h1>
+                <h1 className="text-lg text-green-400">{(menu.price).toLocaleString()} ETB</h1>
                 <h1 className={'bg-white/40 rounded-2xl p-1 text-white text-sm uppercase'}>{menu.category}</h1>
                 <LiaCartArrowDownSolid 
                     className="absolute size-10 -right-4 -bottom-3 bg-green-400 rounded-2xl skew-6 hover:skew-0 hover:rounded-sm duration-300 cursor-pointer"

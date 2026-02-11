@@ -17,6 +17,7 @@ export default function Product() {
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState(null);
     const [editProduct, setEditProduct] = useState({
+        id: "",
         name: "",
         description: "",
         price: "",
@@ -40,8 +41,8 @@ export default function Product() {
     const get_products = async () => {
         if (loading===true) return;
         setLoading(true);
-        const req = await request("/manager/get-product");
-        const res = await req.json();
+        const req = await request("/customer/get-product");
+        const res = !req.error && await req.json();
         if (!req.ok || req.error) {
             setMsg({msg:res.msg || req.error, type:"error"});
             setLoading(false);
