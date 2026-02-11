@@ -7,6 +7,7 @@ import { FaPlus } from "react-icons/fa";
 import ProductCard from "../../components/manager/ProductCard.jsx";
 import EditProduct from "../../components/manager/EditProduct.jsx";
 import { AnimatePresence } from "framer-motion";
+import Popup from "../../components/Popup.jsx";
 
 export default function Product() {
 
@@ -109,6 +110,7 @@ export default function Product() {
         },
     ]);
     const [loading, setLoading] = useState(!true);
+    const [msg, setMsg] = useState(null);
     const [editProduct, setEditProduct] = useState({
         name: "",
         description: "",
@@ -161,7 +163,12 @@ export default function Product() {
                         }
                         <AnimatePresence mode={'wait'}>
                             { openEdit &&
-                                    <EditProduct product={editProduct} setOpenEdit={setOpenEdit} />
+                                    <EditProduct product={editProduct} setOpenEdit={setOpenEdit} setMsg={setMsg} />
+                            }
+                        </AnimatePresence>
+                        <AnimatePresence mode="wait">
+                            { msg &&
+                                <Popup msg={msg.msg} type={msg.type ? msg.type : "success"} setMsg={setMsg}/>
                             }
                         </AnimatePresence>
                     </div>

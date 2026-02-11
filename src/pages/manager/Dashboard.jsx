@@ -2,7 +2,7 @@ import Sidebar from "../../components/manager/Sidebar.jsx";
 import MostOrdered from "../../components/manager/MostOrdered.jsx";
 import TodayInfo from "../../components/manager/TodayInfo.jsx";
 import OrderReport from "../../components/manager/OrderReport.jsx";
-import {useState} from "react";
+import { useState } from "react";
 
 export default function Dashboard() {
 

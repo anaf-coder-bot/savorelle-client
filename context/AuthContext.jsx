@@ -26,9 +26,11 @@ export const AuthProvider = ({ children }) => {
                 const responde = await request.json();
                 setAccessToken(responde.accessToken);
                 setUser(responde.user);
+                return responde.accessToken;
             } else {
                 setAccessToken(null);
                 setUser(null);
+                return null;
             };
         } catch (error) {
             console.error("Silent refresh failed:",error.message);

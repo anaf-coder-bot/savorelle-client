@@ -1,15 +1,17 @@
 import { motion } from "framer-motion";
 import {useState} from "react";
 import Loading2 from "../Loading2.jsx";
+import { useApi } from "../../../functions/api/api.js";
 
-export default function EditProduct({ product, setOpenEdit }) {
+export default function EditProduct({ product, setOpenEdit, setMsg }) {
+    const { request } = useApi();
 
     const [data, setData] = useState({
         name: product.name,
         description: product.description,
         price: product.price,
         img: product.img,
-        category: product.category,
+        category: product.category || 'starters',
     });
     const [loading, setLoading] = useState(false);
 
@@ -18,11 +20,21 @@ export default function EditProduct({ product, setOpenEdit }) {
         setData(prev => ({...prev, [name]:value}));
     };
 
-    const submit_form = (e) => {
+    const submit_form = async (e) => {
         e.preventDefault();
-        if (!data.name || !data.description || !data.price || !data.img || !data.category || loading) return;
+        console.log(product.category)
+        if (!data.name || !data.price || !data.img || !data.category || loading) return;
         setLoading(true);
+        const req = await request("/manager/add-product", {method: "POST", body: JSON.stringify(data)});
+        const res = await req.json();
 
+        if (req.error || req.status!==200) {
+            setMsg({msg: req.error||res.msg, type:"error"});
+            setLoading(false);
+        } else {
+            setMsg({msg: res.msg});
+            setOpenEdit(false);   
+        };
     };
 
    return (
@@ -39,7 +51,7 @@ export default function EditProduct({ product, setOpenEdit }) {
                         <div className={'text-end pr-3'}>
                             <h1 className={'font-bold text-lg cursor-pointer inline'} onClick={() => setOpenEdit(false)}>X</h1>
                         </div>
-                        <h1 className={'text-lg'}>{data.name ? "Edit Product" : "Add Product"}</h1>
+                        <h1 className={'text-lg'}>{product.name ? "Edit Product" : "Add Product"}</h1>
                         {data.img &&
                             <div className={'flex items-center justify-center border-b pb-1'}>
                                 <img
@@ -61,6 +73,7 @@ export default function EditProduct({ product, setOpenEdit }) {
                                     value={data.name}
                                     onChange={handle_change}
                                     required
+                                    maxLength={50}
                                 />
                             </div>
                             <div className={'flex flex-col md:flex-row w-full md:w-auto items-center gap-5'}>
@@ -73,11 +86,12 @@ export default function EditProduct({ product, setOpenEdit }) {
                                     value={data.price}
                                     onChange={handle_change}
                                     required
+                                    maxLength={100}
                                 />
                             </div>
                             <div className={'flex flex-col md:flex-row w-full md:w-auto items-center gap-5'}>
                                 <h1>Category</h1>
-                                <select name="category" onChange={handle_change} value={data.category} required className={'border-red-400 border-2 text-center outline-none w-50'}>
+                                <select name="category" onChange={handle_change} value={data.category||''} required className={'border-red-400 border-2 text-center outline-none w-50'}>
                                     <option value="starters">Starters</option>
                                     <option value="main dishes">Main Dishes</option>
                                     <option value="desserts">Desserts</option>
@@ -103,7 +117,6 @@ export default function EditProduct({ product, setOpenEdit }) {
                                     name={'description'}
                                     value={data.description}
                                     onChange={handle_change}
-                                    required
                                 />
                             </div>
                         </div>

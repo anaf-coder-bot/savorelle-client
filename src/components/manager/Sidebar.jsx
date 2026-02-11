@@ -1,6 +1,5 @@
 import StaggeredMenu from "../../components/manager/StaggeredMenu.jsx";
 import {useState} from "react";
-import Cookies from "js-cookie";
 import {useNavigate} from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext.jsx";
 
