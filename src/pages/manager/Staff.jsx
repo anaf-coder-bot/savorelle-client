@@ -27,6 +27,15 @@ export default function Staff() {
         get_staff();
     }, []);
 
+
+    useEffect(() => {
+        if (openEdit)
+            document.body.classList.add("overflow-hidden");
+        else
+            document.body.classList.remove("overflow-hidden");
+
+        return () => document.body.classList.remove("overflow-hidden");
+    }, [openEdit])
     useEffect(() => {
         if (openEdit)
             document.body.classList.add("overflow-hidden");

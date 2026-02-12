@@ -18,7 +18,7 @@ export default function StaffCard({staff, setOpenEdit, setEditStaff }) {
     return (
         <div className={'w-full border border-dashed border-red-400 h-100 rounded-lg flex flex-col justify-between hover:bg-gray-100'}>
             <div className="flex flex-col gap-5 p-3">
-                <h1 className="text-lg">Staff: <span className="font-bold">{staff.role}</span> </h1>
+                <h1 className="text-lg">Staff: <span className="font-bold uppercase">{staff.role}</span> </h1>
                 <h1 className="text-lg">Username: <span className="font-bold">{staff.username}</span></h1>
                 <h1 className="text-lg">Email: <span className="font-bold">{staff.email}</span></h1>
                 <h1 className="text-lg">Joined at: <span className="font-bold">

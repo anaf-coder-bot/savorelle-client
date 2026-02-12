@@ -39,7 +39,7 @@ export default function Product() {
     }, [openEdit]);
 
     const get_products = async () => {
-        if (loading===true) return;
+        if (loading) return;
         setLoading(true);
         const req = await request("/customer/get-product");
         const res = !req.error && await req.json();
