@@ -11,6 +11,7 @@ import ManagerDashboard from "./pages/manager/Dashboard.jsx";
 import Product from "./pages/manager/Product.jsx";
 import ChefDashboard from "./pages/Chef/ChefDashboard.jsx";
 import Staff from "./pages/manager/Staff.jsx";
+import Table from "./pages/manager/Table.jsx";
 
 export default function App() {
   return (
@@ -42,6 +43,13 @@ export default function App() {
           <Route path={"/manager/staff"} element={
             <ProtectedRoute allowedRoles={["manager"]}>
               <Staff />
+            </ProtectedRoute>
+          }
+          />
+
+          <Route path={"/manager/table"} element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <Table />
             </ProtectedRoute>
           }
           />

@@ -45,7 +45,7 @@ export default function EditStaff({ staff, setOpenEdit, setMsg, get_staff }) {
 
     const handle_add = async () => await request("/manager/add-staff", {method: "POST", body:JSON.stringify(data)});
 
-    const handle_edit = async () => await request("", {method: "POST", body:JSON.stringify(data)});
+    const handle_edit = async () => await request("/manager/edit-staff", {method: "POST", body:JSON.stringify(data)});
 
     return (
         <motion.div
