@@ -47,6 +47,21 @@ export default function EditStaff({ staff, setOpenEdit, setMsg, get_staff }) {
 
     const handle_edit = async () => await request("/manager/edit-staff", {method: "POST", body:JSON.stringify(data)});
 
+    const handle_delete = async () => {
+        if (!staff.id || loading) return;
+        setLoading(true);
+        const req = await request("/manager/delete-staff", {method:"POST", body:JSON.stringify({id:staff.id})});
+        const res = !req.error && await req.json();
+
+        if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
+        else {
+            setMsg({msg:res.msg});
+            setOpenEdit(false);
+            get_staff();
+        };
+        setLoading(false);
+    };
+
     return (
         <motion.div
            initial={{scale:0}}
@@ -96,9 +111,15 @@ export default function EditStaff({ staff, setOpenEdit, setMsg, get_staff }) {
                                 />
                             </div>
                         </div>
-                        <button type={'submit'} className={'bg-red-400 p-2 rounded-lg text-white cursor-pointer mt-3'}>
+                        <button type={'submit'} className={'bg-green-400 p-2 rounded-lg text-white cursor-pointer mt-3'}>
                             Submit
                         </button>
+                        {
+                            staff.id &&
+                            <button type={'button'} onClick={handle_delete} className={'bg-red-400 p-2 ml-5 rounded-lg text-white cursor-pointer mt-3'}>
+                                Delete
+                            </button>
+                        }
                     </form>
                 )}
             </div>
