@@ -43,13 +43,10 @@ export default function Product() {
         setLoading(true);
         const req = await request("/customer/get-product");
         const res = !req.error && await req.json();
-        if (!req.ok || req.error) {
-            setMsg({msg:res.msg || req.error, type:"error"});
-            setLoading(false);
-        } else {
-            setProducts(res.product);
-            setLoading(false);
-        };
+
+        if (!req.ok || req.error) setMsg({msg:res.msg || req.error, type:"error"});
+        else setProducts(res.product);
+        setLoading(false);
     };
 
     return (
@@ -57,29 +54,32 @@ export default function Product() {
             <Sidebar />
             <div className={'p-5'}>
                 <h1 className={'font-bold text-2xl'}>Products Details</h1>
-                {loading===true ? <div className={'flex items-center justify-center h-[calc(100vh-10rem)]'}><Loading2 /></div> : loading===false ? (
-                    <div className={'grid grid-cols-1 md:grid-cols-4 gap-5 mt-10'}>
-                        <div
-                            className={'w-full border border-dashed border-red-400 h-70 md:h-100 rounded-lg flex flex-col items-center justify-center gap-5 cursor-pointer'}
-                            onClick={() => {
-                                setEditProduct({
-                                    name: "",
-                                    description: "",
-                                    price: "",
-                                    img: "",
-                                    category: "",
-                                })
-                                setOpenEdit(true);
-                            }}
-                        >
-                            <FaPlus className={'size-8'}/>
-                            <h1 className={'text-sm'}>Add new Dish</h1>
+                {loading ? <div className={'flex items-center justify-center h-[calc(100vh-10rem)]'}><Loading2 /></div> : (
+                    <div>
+                        <div className={'grid grid-cols-1 md:grid-cols-4 gap-5 mt-10'}>
+                            <div
+                                className={'w-full border border-dashed border-red-400 h-70 md:h-100 rounded-lg flex flex-col items-center justify-center gap-5 cursor-pointer'}
+                                onClick={() => {
+                                    setEditProduct({
+                                        id: "",
+                                        name: "",
+                                        description: "",
+                                        price: "",
+                                        img: "",
+                                        category: "",
+                                    });
+                                    setOpenEdit(true);
+                                }}
+                            >
+                                <FaPlus className={'size-8'}/>
+                                <h1 className={'text-sm'}>Add new Dish</h1>
+                            </div>
+                            {
+                                products && products.map(p => 
+                                    <ProductCard key={p.id} product={p} setEditProduct={setEditProduct} setOpenEdit={setOpenEdit} />
+                                )
+                            }
                         </div>
-                        {
-                            products && products.map(p => (
-                                <ProductCard key={p.id} product={p} setEditProduct={setEditProduct} setOpenEdit={setOpenEdit} />
-                            ))
-                        }
                         <AnimatePresence mode={'wait'}>
                             { openEdit &&
                                     <EditProduct product={editProduct} setOpenEdit={setOpenEdit} setMsg={setMsg} get_product={get_products} />
@@ -91,14 +91,7 @@ export default function Product() {
                             }
                         </AnimatePresence>
                     </div>
-                ) : (
-                    <div className={'flex flex-col items-center justify-center h-[calc(100vh-10rem)]'}>
-                        <h1 className={'text-red-400 font-bold flex items-center gap-2'}> <MdError /> Can't get data.</h1>
-                        <button className={'bg-yellow-300 rounded-lg mt-5 p-2 flex items-center gap-2 cursor-pointer'} onClick={get_products}>
-                            <FaArrowsRotate /> Try again
-                        </button>
-                    </div>
-                    )}
+                )}
             </div>
         </div>
     )

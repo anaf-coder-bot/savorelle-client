@@ -50,7 +50,7 @@ export default function Header() {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 1 }}
-          className={`hidden md:flex items-center gap-2 bg-blue-500 px-4 py-3 rounded-2xl hover:scale-110 transition cursor-pointer`}
+          className={`hidden md:flex items-center gap-2 bg-green-500 px-4 py-3 rounded-2xl hover:scale-110 transition cursor-pointer`}
           onClick={() => navigate("/login")}
         >
           Login
@@ -99,7 +99,7 @@ export default function Header() {
                 setOpen(false);
                 navigate("/login");
               }}
-              className={`flex items-center gap-2 bg-blue-500 px-4 py-3 rounded-xl w-fit`}
+              className={`flex items-center gap-2 bg-green-500 px-4 py-3 rounded-xl w-fit`}
             >
               Login
               <IoLogIn className="size-6 text-black" />

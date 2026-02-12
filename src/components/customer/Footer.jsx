@@ -23,7 +23,7 @@ export default function Footer() {
                     transition={{duration:1.5, delay:.5}}
                     className="flex flex-col items-start justify-start gap-5"
                 >
-                    <h1 className="text-6xl text-white">Sabeh</h1>
+                    <h1 className="text-6xl text-white">Savorele</h1>
                     <h1 className="text-white">Where Taste Meets Elegance</h1>
                     <h1 className="text-white">Visit Us</h1>
                     <div className="flex items-center gap-5">
@@ -52,7 +52,7 @@ export default function Footer() {
                     transition={{duration:1.5, delay:1}}
                     className="hidden md:block flex flex-col items-center justify-start text-white text-xl gap-3"
                 >
-                    <h1>Sabeh</h1>
+                    <h1>Savorelle</h1>
                     {["Home", "Menus", "Reserve Table", "Gallery", "Contact"].map(item => {
                         const new_ = item.replace(" ", "-");
                         return <h1 key={item} className="cursor-pointer" onClick={() => navigate(`/${new_.toLocaleLowerCase()}`)}>{item}</h1>
@@ -66,7 +66,7 @@ export default function Footer() {
                     className="hidden md:block flex flex-col items-start justify-start text-gray-400 text-xl gap-3 w-1/4"
                 >
                     <h1 className="flex items-center gap-3">
-                        <FaLocationDot /> Alem Bank, at Shawa Building
+                        <FaLocationDot /> Ethiopia, Addis Ababa
                     </h1>
                     <h1 className="flex items-center gap-3">
                         <FaPhoneAlt /> +2519-9492-4132

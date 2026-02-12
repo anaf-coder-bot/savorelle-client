@@ -6,6 +6,8 @@ import { useAuth } from "../../../context/AuthContext.jsx";
 const menuItems = [
     {label: 'Dashboard', ariaLabel: 'Go to Dashboard', link: '/manager'},
     {label: 'Products', ariaLabel: 'Go to Products', link: '/manager/product'},
+    {label: 'Staff', ariaLabel: 'Go to Staff', link: '/manager/staff'},
+    {label: 'Table', ariaLabel: 'Go to Table', link: '/manager/table'},
     {label: 'Report', ariaLabel: 'Go to Report', link: '/manager/report'},
 ];
 

@@ -10,6 +10,7 @@ import ProtectedRoute from "../middleware/ProtectedRoute.jsx";
 import ManagerDashboard from "./pages/manager/Dashboard.jsx";
 import Product from "./pages/manager/Product.jsx";
 import ChefDashboard from "./pages/Chef/ChefDashboard.jsx";
+import Staff from "./pages/manager/Staff.jsx";
 
 export default function App() {
   return (
@@ -32,8 +33,15 @@ export default function App() {
           }
           />
           <Route path={"/manager/product"} element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["manager"]}>
               <Product />
+            </ProtectedRoute>
+          }
+          />
+
+          <Route path={"/manager/staff"} element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <Staff />
             </ProtectedRoute>
           }
           />

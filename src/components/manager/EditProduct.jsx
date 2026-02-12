@@ -24,25 +24,24 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
     const submit_form = async (e) => {
         e.preventDefault();
         
-        if (!data.name || !data.price || !data.img || !data.category || loading) return;
+        if (!data.name || !data.price || !data.img || !data.category || loading || ( product.id && !data.id )) return;
         setLoading(true);
         
         let req;
-        if (!product.name)
+        if (!product.id)
             req = await handle_add();
         else
             req = await handle_edit();
 
         const res = !req.error && await req.json();
 
-        if (req.error || !req.ok) {
-            setMsg({msg: req.error||res.msg, type:"error"});
-            setLoading(false);
-        } else {
+        if (req.error || !req.ok) setMsg({msg: req.error||res.msg, type:"error"});
+        else {
             setMsg({msg: res.msg});
             setOpenEdit(false);
             get_product(); 
         };
+        setLoading(false);
     };
 
     const handle_add = async () => await request("/manager/add-product", {method: "POST", body: JSON.stringify(data)});
@@ -63,7 +62,7 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
                         <div className={'text-end pr-3'}>
                             <h1 className={'font-bold text-lg cursor-pointer inline'} onClick={() => setOpenEdit(false)}>X</h1>
                         </div>
-                        <h1 className={'text-lg'}>{product.name ? "Edit Product" : "Add Product"}</h1>
+                        <h1 className={'text-lg'}>{product.id ? "Edit Product" : "Add Product"}</h1>
                         {data.img &&
                             <div className={'flex items-center justify-center border-b pb-1'}>
                                 <img
@@ -103,7 +102,7 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
                             </div>
                             <div className={'flex flex-col md:flex-row w-full md:w-auto items-center gap-5'}>
                                 <h1>Category</h1>
-                                <select name="category" onChange={handle_change} value={data.category||''} required className={'border-red-400 border-2 text-center outline-none w-50'}>
+                                <select name="category" onChange={handle_change} value={data.category} required className={'border-red-400 border-2 text-center outline-none w-50'}>
                                     <option value="starters">Starters</option>
                                     <option value="main dishes">Main Dishes</option>
                                     <option value="desserts">Desserts</option>

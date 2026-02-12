@@ -36,9 +36,9 @@ export default function Contact() {
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit exercitationem consectetur perspiciatis adipisci nam qui animi, 
                   optio quidem iusto ex autem excepturi aspernatur aperiam commodi itaque, repellendus reiciendis saepe magni!
               </motion.h1>
-              <motion.div initial={{opacity:0, x:-50}} animate={{opacity:1, x:0}} transition={{duration:1.5, delay:1.5}} className="flex flex-col md:flex-row items-start md:items-center gap-10 w-full text-white text-xl">
+              <motion.div initial={{opacity:0, x:-50}} animate={{opacity:1, x:0}} transition={{duration:1.5, delay:1.5}} className="flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-30 w-full text-white text-xl">
                 <h1 className="flex items-center gap-3">
-                    <FaLocationDot /> Alem Bank, at Shawa Building
+                    <FaLocationDot /> Ethiopia, Addis Ababa
                 </h1>
                 <h1 className="flex items-center gap-3">
                       <FaPhoneAlt /> +2519-9492-4132
