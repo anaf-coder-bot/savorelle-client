@@ -184,7 +184,7 @@ export default function Cart() {
                             Back to Menus
                         </button>
                     </div>
-                    <AnimatePresence>
+                    <AnimatePresence mode="wait">
                         {onVerify&&<VerifyEmail data={data} setData={setData} setOnVerify={setOnVerify} />}
                     </AnimatePresence>
                 </div>

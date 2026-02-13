@@ -1,18 +1,21 @@
-import {motion} from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { MdMarkEmailUnread } from "react-icons/md";
 import Loading from "../Loading";
 import { useEffect, useState } from "react";
+import { useApi } from "../../../functions/api/api";
+import Popup from "../Popup";
 
 export default function VerifyEmail({data, setData, setOnVerify}) {
 
+    const { request } = useApi();
     const [loading, setLoading] = useState(false);
     const [code, setCode] = useState({
         code: "",
         user_code:"",
-        code_msg: ["Input the code we sent to you.", "yellow"],
     });
     const [timeLeft, setTimeLeft] = useState(0);
+    const [msg, setMsg] = useState(null);
 
     useEffect(() => {
         if (code.user_code.length===4) {
@@ -20,10 +23,9 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
                 setLoading(true);
                 // INITALIZE THE PAYMENT
             } else {
-                setCode(prev => ({...prev, code_msg:["Invalid code. Try again.", "red"]}));
+                setMsg({msg:"Invalid code, try again.", type:"error"});
+                setCode(prev => ({...prev, user_code:""}));
             };
-        } else {
-            setCode(prev => ({...prev, code_msg:["Input the code we sent to you.", "yellow"]}));
         };
     }, [code.user_code]);
 
@@ -41,13 +43,16 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
         setData(prev => ({...prev, [name]:value}));
     };
 
-    const send_email = (e) => {
+    const send_email = async (e) => {
         e.preventDefault();
         if (!data.name || !data.phone || !data.email || loading) return;
         setLoading(true);
-        // SEND EMAIL HERE
+        
+        const req = await request("/customer/verify-email", {method:"POST", body:JSON.stringify(data)});
+        const res = !req.error && await req.json();
+        if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
+        else setCode({code:String(res.code), user_code:""});
 
-        // AFTER EMAIL SENT
         setLoading(false);
         setTimeLeft(20); // TIMER
     };
@@ -115,7 +120,6 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
                         <input 
                             type="text" 
                             maxLength={4}
-                            required={code.code?true:false}
                             className="bg-black p-2 rounded-3xl border border-white text-white text-center focus:border-green-400 outline-none"
                             name="code_user"
                             value={code.user_code}
@@ -124,7 +128,7 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
                             placeholder="1234"
                         />
                     </div>
-                    <small className={`text-${code.code_msg[1]}-600 ${code.code?'block':'hidden'}`}>*{code.code_msg[0]}</small>
+                    <small className={`text-yellow-600 ${code.code?'block':'hidden'}`}>*Input the code we sent to you</small>
                     <div className="flex items-center gap-10">
                         <button type="button" className="bg-gray-400 p-2 rounded-2xl cursor-pointer flex items-center gap-2" onClick={() => {setOnVerify(false);setData({name:"", phone:"", email:""}); setCode({code:"", user_code:"", code_msg:"Input the code we sent to you."})}}>
                             <IoMdArrowRoundBack /> Back to Cart
@@ -133,6 +137,11 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
                             <MdMarkEmailUnread /> Send Code {timeLeft?timeLeft:""}
                         </button>
                     </div>
+                    <AnimatePresence mode="wait">
+                        { msg &&
+                            <Popup msg={msg.msg} type={msg.type ? msg.type : "success"} setMsg={setMsg}/>
+                        }
+                    </AnimatePresence>
                 </form>
             )}
         </motion.div>

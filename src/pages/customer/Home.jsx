@@ -42,8 +42,7 @@ export default function Home() {
     if (req.error||!req.ok) setMsg({msg:req.error||res.msg, error:"error"});
     else {
       setMsg({msg:`Table ${res.table[0].table_no} selected.`});
-      console.log(res.table[0])
-      Cookie.set("table", JSON.stringify(res.table[0]), { expires: new Date(Date.now() + 3 * 60 * 60 * 1000) });
+      Cookie.set("table", JSON.stringify(res.table[0]), { expires: new Date(Date.now() + 2 * 60 * 60 * 1000) });
     };
     param.delete("table-id");
     setParam(param, { replace:true });
