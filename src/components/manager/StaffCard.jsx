@@ -29,6 +29,13 @@ export default function StaffCard({staff, setOpenEdit, setEditStaff }) {
                     })}</span>
                 </h1>
                 <h1 className="border-b">Tables assigned:</h1>
+                <div className="grid grid-cols-4">
+                    {
+                        staff.tables.map(t => 
+                            <h1 className="text-gray-700 text-sm">• {t.table_no}</h1>
+                        )
+                    }
+                </div>
             </div>
             <button className={'flex items-center justify-center gap-2 w-full bg-yellow-300 h-20 cursor-pointer'} onClick={do_edit}>
                 <FaPen /> Edit
