@@ -4,7 +4,7 @@ import { BiSolidRightTopArrowCircle } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
 import { PiHamburgerDuotone } from "react-icons/pi";
 import { IoMdFlame } from "react-icons/io";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import CircularText from "../../components/customer/CircularText";
 import { TbToolsKitchen2 } from "react-icons/tb";
 import { FaMobile } from "react-icons/fa";
@@ -17,18 +17,37 @@ import { MdArrowDropDownCircle } from "react-icons/md";
 import ScrollTriggered from "../../components/customer/ScrollTriggered";
 import Footer from "../../components/customer/Footer";
 import ShinyText from "../../components/customer/ShinyText";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useApi } from "../../../functions/api/api";
+import Popup from "../../components/Popup";
+import Cookie from "js-cookie";
 
 export default function Home() {
+  const { request } = useApi();
   const navigate = useNavigate();
-  const [parse] = useSearchParams();
+  const [param, setParam] = useSearchParams();
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
 
+  const table_id = param.get("table-id");
   useEffect(() => {
-    const table_id = parse.get("table-id");
-    if (table_id) {
-      // FETCH TABLE INFO
+    if (table_id) get_table();
+  }, []);
+
+  const get_table = async () => {
+    if (loading) return;
+    setLoading(true);
+    const req = await request(`/customer/get-table/${table_id}`);
+    const res = !req.error && await req.json();
+    if (req.error||!req.ok) setMsg({msg:req.error||res.msg, error:"error"});
+    else {
+      setMsg({msg:`Table ${res.table[0].table_no} selected.`});
+      console.log(res.table[0])
+      Cookie.set("table", JSON.stringify(res.table[0]), { expires: new Date(Date.now() + 3 * 60 * 60 * 1000) });
     };
-  });
+    param.delete("table-id");
+    setParam(param, { replace:true });
+  };
 
   return (
     <div
@@ -374,6 +393,12 @@ export default function Home() {
           Book a Table <BiSolidRightTopArrowCircle className="size-5" />
         </motion.button>
       </div>
+      <AnimatePresence mode="wait">
+          {
+            msg &&
+              <Popup msg={msg.msg} type={msg.type ? msg.type : "success"} setMsg={setMsg}/>
+          }
+      </AnimatePresence>
       <Footer />
     </div>
   );

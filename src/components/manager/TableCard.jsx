@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { FaD, FaPen } from "react-icons/fa6";
 import { FaDownload } from "react-icons/fa6";
@@ -7,8 +7,12 @@ import { FaDownload } from "react-icons/fa6";
 export default function TableCard({ table, setEditTable, setOpenEdit }) {
 
     const qrRef = useRef();
+    const [loading, setLoading] = useState(false);
+    const origin = window.location.origin;
 
     const handle_download = () => {
+        if (loading) return;
+        setLoading(false);
         const canvas = qrRef.current.querySelector('canvas');
         const qrSize = canvas.width;
         const padding = 40;
@@ -39,6 +43,8 @@ export default function TableCard({ table, setEditTable, setOpenEdit }) {
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+
+        setLoading(false);
     };
 
     const do_edit = () => {
@@ -57,10 +63,10 @@ export default function TableCard({ table, setEditTable, setOpenEdit }) {
                 <h1 className="font-bold text-xl text-center">Waiter: {table.waiter_username}</h1>
                 <div ref={qrRef}>
                     <QRCodeCanvas 
-                    value={table.id} 
-                    size={200} 
-                    level={"H"}
-                    includeMargin={true}
+                        value={`${origin}?table-id=${table.id}`} 
+                        size={200} 
+                        level={"H"}
+                        includeMargin={true}
                     />
                 </div>
             </div>

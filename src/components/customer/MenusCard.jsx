@@ -2,7 +2,6 @@ import { LiaCartArrowDownSolid } from "react-icons/lia";
 import {motion} from "framer-motion";
 import { useState } from "react";
 import Cookies from "js-cookie";
-import formatMoney from "../../../functions/func";
 
 
 export default function MenusCard({menu, index, setDoCartCheck}) {

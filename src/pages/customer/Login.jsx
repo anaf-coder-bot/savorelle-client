@@ -4,7 +4,6 @@ import {useNavigate} from "react-router-dom";
 import Loading from "../../components/Loading.jsx";
 import { login_user } from "../../../functions/auth/auth.api";
 import { useAuth } from "../../../context/AuthContext.jsx";
-import LoadingToken from "../../components/LoadingToken.jsx";
 
 export default function Login() {
     const navigate = useNavigate();

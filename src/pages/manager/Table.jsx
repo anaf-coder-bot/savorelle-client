@@ -27,10 +27,10 @@ export default function Table() {
     useEffect(() => {
         get_tables();
         const get_waiters = async () => {
-            const req = await request("/customer/get-staff");
+            const req = await request("/manager/get-staff");
             const res = !req.error && await req.json();
             if (req.error || !req.ok) setMsg({msg: "Please re-fresh the page.", type: "error"});
-            else setWaiters(res.msg);
+            else setWaiters(res.staff);
         };
         get_waiters();
     }, []);
