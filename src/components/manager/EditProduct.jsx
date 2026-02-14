@@ -21,6 +21,11 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
         setData(prev => ({...prev, [name]:value}));
     };
 
+    const handle_wheel = (e) => {
+        e.target.blur();
+        e.stopPropagation();
+    };
+
     const submit_form = async (e) => {
         e.preventDefault();
         
@@ -113,6 +118,7 @@ export default function EditProduct({ product, setOpenEdit, setMsg, get_product 
                                     onChange={handle_change}
                                     required
                                     maxLength={100}
+                                    onWheel={handle_wheel}
                                 />
                             </div>
                             <div className={'flex flex-col md:flex-row w-full md:w-auto items-center gap-5'}>

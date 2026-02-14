@@ -185,7 +185,7 @@ export default function Cart() {
                         </button>
                     </div>
                     <AnimatePresence mode="wait">
-                        {onVerify&&<VerifyEmail data={data} setData={setData} setOnVerify={setOnVerify} />}
+                        {onVerify&&<VerifyEmail data={data} setData={setData} setOnVerify={setOnVerify} cart={cart} table={table} />}
                     </AnimatePresence>
                 </div>
             )}

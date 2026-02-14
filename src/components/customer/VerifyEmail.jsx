@@ -5,10 +5,13 @@ import Loading from "../Loading";
 import { useEffect, useState } from "react";
 import { useApi } from "../../../functions/api/api";
 import Popup from "../Popup";
+import { useNavigate } from "react-router-dom";
+import Cookie from "js-cookie";
 
-export default function VerifyEmail({data, setData, setOnVerify}) {
+export default function VerifyEmail({data, setData, setOnVerify, cart, table}) {
 
     const { request } = useApi();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [code, setCode] = useState({
         code: "",
@@ -19,10 +22,8 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
 
     useEffect(() => {
         if (code.user_code.length===4) {
-            if (code.user_code===code.code) {
-                setLoading(true);
-                // INITALIZE THE PAYMENT
-            } else {
+            if (code.user_code===code.code) do_pay();
+            else {
                 setMsg({msg:"Invalid code, try again.", type:"error"});
                 setCode(prev => ({...prev, user_code:""}));
             };
@@ -36,6 +37,23 @@ export default function VerifyEmail({data, setData, setOnVerify}) {
         }, 1000);
         return () => clearInterval(timer);
     }, [timeLeft]);
+
+     const do_pay = async () => {
+        setLoading(true);
+        const s_cart = [];
+        for (const v of Object.values(cart)) {
+            const { id, quantity } = v;
+            s_cart.push({id, quantity});
+        };
+        const req = await request("/customer/start-payment", {method:"POST", body:JSON.stringify({cart:s_cart, table_id:table.id, ...data})});
+        const res = !req.error && await req.json();
+        if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
+        else {
+            navigate("/menus");
+            Cookie.remove("cart");
+            window.location.href =  res.msg.data.checkout_url;
+        };
+    }
 
     const handle_input = (e) => {
         const {name, value} = e.target;
