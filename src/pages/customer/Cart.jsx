@@ -7,7 +7,6 @@ import Loading from "../../components/Loading";
 import AnimatedList from "../../components/customer/CartCard";
 import { MdExposurePlus1 } from "react-icons/md";
 import { TbExposureMinus1 } from "react-icons/tb";
-import formatMoney from "../../../functions/func";
 import VerifyEmail from "../../components/customer/VerifyEmail";
 import { AnimatePresence } from "framer-motion";
 
@@ -65,7 +64,7 @@ export default function Cart() {
                             <h1 className="text-white line-clamp-1">{item.name}</h1>
                         </div>
                         <div className="flex items-center justify-between">
-                            <h1 className="text-white">{formatMoney((item.price*item.quantity))} ETB</h1>
+                            <h1 className="text-white">{Number(item.price*item.quantity).toLocaleString()} ETB</h1>
                             <div className="flex items-center justify-between gap-3 w-1/2">
                                 <TbExposureMinus1 
                                     className="bg-red-400 w-6 h-6 rounded-full p-1 text-black"
@@ -153,29 +152,33 @@ export default function Cart() {
                         <div className="flex items-center justify-between w-full text-white text-xl">
                             <h1>Total({Object.keys(cart).length})</h1>
                             <div className="flex-grow border-b border-white/30 mx-2"/>
-                            <h1>{formatMoney(total)} ETB</h1>
+                            <h1>{Number(total).toLocaleString()} ETB</h1>
                         </div>
                         <div className="w-full">
                             <div className="flex items-center justify-between w-full text-white text-xl">
-                                <h1>Initalize Payment ({FIRST_FEE*100}%)</h1>
+                                <h1>Initalize Fee ({FIRST_FEE*100}%)</h1>
                                 <div className="flex-grow border-b border-white/30 mx-2"/>
-                                <h1 className="text-green-500">{formatMoney((total*FIRST_FEE))}</h1>
+                                <h1 className="text-green-500">{Number((total*FIRST_FEE)).toLocaleString()} ETB</h1>
                             </div>
                             <p className="text-sm text-yellow-500 text-center">* Pay this now to confirm your order.</p>
                         </div>
                         <div className="w-full">
                             <div className="flex items-center justify-between w-full text-white text-xl">
-                                <h1>Final Payment ({LAST_FEE*100}%)</h1>
+                                <h1>Final Fee ({LAST_FEE*100}%)</h1>
                                 <div className="flex-grow border-b border-white/30 mx-2"/>
-                                <h1 className="text-blue-500">{formatMoney((total*LAST_FEE))}</h1>
+                                <h1 className="text-blue-500">{Number((total*LAST_FEE)).toLocaleString()} ETB</h1>
                             </div>
                             <p className="text-sm text-yellow-500 text-center">* Pay the rest after receiving your meal.</p>
                         </div>
+                        <div className="bg-[#d0762c] p-2 rounded-xl text-white">
+                            <strong>Note:</strong> Your initial payment of {total*FIRST_FEE} ETB covers the {FIRST_FEE*100}% order commitment. The remaining balance of {total*LAST_FEE} ETB plus any additional items or tips will be settled once your food is served.
+                        </div>
+
                         <button
                             onClick={() => setOnVerify(true)} 
                             className="text-xl bg-green-500 rounded-2xl text-black p-2 self-center cursor-pointer"
                         >
-                            Pay {formatMoney((total*FIRST_FEE))} ETB Now
+                            Pay {Number(total*FIRST_FEE).toLocaleString()} ETB Now
                         </button>
                         <button 
                             onClick={() => navigate("/menus")}

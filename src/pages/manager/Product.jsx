@@ -1,8 +1,6 @@
 import Sidebar from "../../components/manager/Sidebar.jsx";
 import {useEffect, useState} from "react";
 import Loading2 from "../../components/Loading2.jsx";
-import {FaArrowsRotate} from "react-icons/fa6";
-import {MdError} from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import ProductCard from "../../components/manager/ProductCard.jsx";
 import EditProduct from "../../components/manager/EditProduct.jsx";

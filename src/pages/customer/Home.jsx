@@ -20,7 +20,7 @@ import ShinyText from "../../components/customer/ShinyText";
 import { useEffect, useState } from "react";
 import { useApi } from "../../../functions/api/api";
 import Popup from "../../components/Popup";
-import Cookie from "js-cookie";
+import Cookies from "js-cookie";
 
 export default function Home() {
   const { request } = useApi();
@@ -42,7 +42,7 @@ export default function Home() {
     if (req.error||!req.ok) setMsg({msg:req.error||res.msg, error:"error"});
     else {
       setMsg({msg:`Table ${res.table[0].table_no} selected.`});
-      Cookie.set("table", JSON.stringify(res.table[0]), { expires: new Date(Date.now() + 2 * 60 * 60 * 1000) });
+      Cookies.set("table", JSON.stringify(res.table[0]), { expires: new Date(Date.now() + 2 * 60 * 60 * 1000) });
     };
     param.delete("table-id");
     setParam(param, { replace:true });

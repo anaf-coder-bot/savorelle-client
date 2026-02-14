@@ -12,6 +12,9 @@ import Product from "./pages/manager/Product.jsx";
 import ChefDashboard from "./pages/Chef/ChefDashboard.jsx";
 import Staff from "./pages/manager/Staff.jsx";
 import Table from "./pages/manager/Table.jsx";
+import CheckPayment from "./pages/customer/CheckPayment.jsx";
+import PaymentSuccess from "./pages/customer/PaymentSuccess.jsx";
+import PaymentFailed from "./pages/customer/PaymentFailed.jsx";
 
 export default function App() {
   return (
@@ -25,6 +28,10 @@ export default function App() {
           <Route path="/gallery" element={<Gallery />}/>
           <Route path="/contact" element={<Contact />}/>
           <Route path="/login" element={<Login />}/>
+          
+          <Route path="/check-payment" element={<CheckPayment />}/>
+          <Route path="/payment-success/:round" element={<PaymentSuccess />}/>
+          <Route path="/payment-failed/:round" element={<PaymentFailed />}/>
 
           {/* MANAGER */}
           <Route path={"/manager"} element={

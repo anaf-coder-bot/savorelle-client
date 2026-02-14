@@ -2,11 +2,10 @@ import {AnimatePresence, motion} from "framer-motion";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { MdMarkEmailUnread } from "react-icons/md";
 import Loading from "../Loading";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApi } from "../../../functions/api/api";
 import Popup from "../Popup";
 import { useNavigate } from "react-router-dom";
-import Cookie from "js-cookie";
 
 export default function VerifyEmail({data, setData, setOnVerify, cart, table}) {
 
@@ -19,9 +18,11 @@ export default function VerifyEmail({data, setData, setOnVerify, cart, table}) {
     });
     const [timeLeft, setTimeLeft] = useState(0);
     const [msg, setMsg] = useState(null);
+    const codeRef = useRef(null);
 
     useEffect(() => {
         if (code.user_code.length===4) {
+            codeRef.current.blur();
             if (code.user_code===code.code) do_pay();
             else {
                 setMsg({msg:"Invalid code, try again.", type:"error"});
@@ -48,11 +49,7 @@ export default function VerifyEmail({data, setData, setOnVerify, cart, table}) {
         const req = await request("/customer/start-payment", {method:"POST", body:JSON.stringify({cart:s_cart, table_id:table.id, ...data})});
         const res = !req.error && await req.json();
         if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
-        else {
-            navigate("/menus");
-            Cookie.remove("cart");
-            window.location.href =  res.msg.data.checkout_url;
-        };
+        else window.location.href =  res.msg.data.checkout_url;
     }
 
     const handle_input = (e) => {
@@ -137,6 +134,7 @@ export default function VerifyEmail({data, setData, setOnVerify, cart, table}) {
                         <h1 className="font-bold">Code:</h1>
                         <input 
                             type="text" 
+                            ref={codeRef}
                             maxLength={4}
                             className="bg-black p-2 rounded-3xl border border-white text-white text-center focus:border-green-400 outline-none"
                             name="code_user"
