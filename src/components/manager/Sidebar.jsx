@@ -1,5 +1,5 @@
-import StaggeredMenu from "../../components/manager/StaggeredMenu.jsx";
-import {useState} from "react";
+import StaggeredMenu from "../StaggeredMenu.jsx";
+import {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext.jsx";
 
@@ -15,11 +15,11 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const loading = useRef(false);
 
     const handle_logout = () => {
-        if (loading) return;
-        setLoading(true);
+        if (loading.current) return;
+        loading.current = true;
         logout();
         return navigate("/", { replace: true });
     };

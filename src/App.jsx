@@ -14,6 +14,7 @@ import Table from "./pages/manager/Table.jsx";
 import CheckPayment from "./pages/customer/CheckPayment.jsx";
 import PaymentSuccess from "./pages/customer/PaymentSuccess.jsx";
 import PaymentFailed from "./pages/customer/PaymentFailed.jsx";
+import KDS from "./pages/kitchen/KDS.jsx";
 
 export default function App() {
   return (
@@ -59,6 +60,15 @@ export default function App() {
             </ProtectedRoute>
           }
           />
+
+          {/* KITHCEN */}
+          <Route path={"/kitchen"} element={
+            <ProtectedRoute allowedRoles={["kitchen"]}>
+              <KDS />
+            </ProtectedRoute>
+          }
+          />
+          
 
           {/* 404 */}
           <Route path="/*" element={<NotFound />}/>

@@ -1,6 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import Loading2 from "../src/components/Loading2";
-import LoadingToken from "../src/components/LoadingToken";
 
 const AuthContext = createContext();
 
