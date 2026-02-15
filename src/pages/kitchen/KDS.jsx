@@ -1,64 +1,106 @@
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import { SiCodechef } from "react-icons/si";
 import { useApi } from "../../../functions/api/api";
-import { useEffect, useState } from "react";
-import { useAuth } from "../../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import Loading2 from "../../components/Loading2";
+import { socket } from "../../socket/sockt";
+import { AnimatePresence } from "framer-motion";
+import Popup from "../../components/Popup";
+import newOrderSound from "../../assets/sound/notification.wav"
+
 
 export default function KDS() {
-    
+
     const { logout } = useAuth();
     const { request } = useApi();
-    const navigate = useNavigate();
-
-    // 0 = pending, 1 = preparing
+    // 0 pending, 1 preparing
     const [page, setPage] = useState(0);
-
-    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState(null);
-
+    const [data, setData] = useState([]);
+    const loadingRef = useRef(false);
+    const audioRef = useRef(null);
 
     useEffect(() => {
         get_orders();
     }, []);
 
+    useEffect(() => {
+        audioRef.current = new Audio(newOrderSound);
+        audioRef.current.volume = 1;
+    }, []);
+
+    useEffect(() => {
+        socket.connect();
+        socket.emit("join-kitchen");
+        
+        socket.on("new-order", order => {
+            setData(prev => [...prev, order]);
+            setPage(0);
+            if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play().catch(() => {});
+            };
+        });
+
+        socket.on("order-updated", updatedOrder => {
+            setData(prev => 
+                prev
+                    .map(o => 
+                        o.id === updatedOrder.id ? updatedOrder : o
+                    )
+                    .filter(o => o.status!=="serving")
+            );
+        });
+
+        return () => {
+            socket.off("new-order");
+            socket.off("order-updated");
+            socket.disconnect();
+        }
+    }, []);
 
     const get_orders = async () => {
-
         if (loading) return;
-
         setLoading(true);
-
         const req = await request("/kitchen/get-orders");
-
         const res = !req.error && await req.json();
-
-        if (req.error || !req.ok) {
-
-            setMsg({
-                msg: req.error || res.msg,
-                type: "error"
-            });
-
-        } else {
-
-            // only store pending + preparing
-            const filtered =
-                (res.orders || []).filter(
-                    o =>
-                        o.status === "pending" ||
-                        o.status === "preparing"
-                );
-
-            setOrders(filtered);
-
-        }
-
+        if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
+        else setData(res.orders);
         setLoading(false);
-
     };
 
+    const getStatus = () => {
+        return page === 0 ? "pending" : "preparing";
+    };
+
+    const pages_order = data.filter(o => o.status === getStatus());
+
+    const handle_update = async (id, status) => {
+        if (!id || !status || loadingRef.current) return;
+        loadingRef.current = true;
+        const req = await request("/kitchen/update-status", {method:"POST", body:JSON.stringify({id, status})});
+        const res = !req.error && await req.json();
+        if (req.error || !req.ok) setMsg({msg:req.error||res.msg, type:"error"});
+        else {
+
+            const updatedOrder = res.order;
+
+            setData(prev => {
+                
+                if (status==="done") {
+                    return prev.filter(o => o.id!=id);
+                } else {
+                    return prev.map(o => 
+                        o.id === id
+                            ? {...o, status}
+                            : o
+                    )
+                };
+            });
+        };
+        loadingRef.current=false;
+    };
 
     const handle_logout = () => {
 
@@ -66,73 +108,20 @@ export default function KDS() {
         navigate("/", { replace: true });
 
     };
-
-
-    const getStatus = () => {
-        return page === 0 ? "pending" : "preparing";
-    };
-
-
-    const filteredOrders =
-        orders.filter(
-            order => order.status === getStatus()
-        );
-
-
-    const updateStatus = async (id, status) => {
-
-        const req = await request(
-            `/kitchen/update-status`,
-            {
-                method: "POST",
-                body: JSON.stringify({ id, status })
-            }
-        );
-
-        if (!req.ok) return;
-
-        // move pending → preparing OR remove if done
-        if (status === "done") {
-
-            setOrders(prev =>
-                prev.filter(o => o.id !== id)
-            );
-
-        } else {
-
-            setOrders(prev =>
-                prev.map(o =>
-                    o.id === id
-                        ? { ...o, status }
-                        : o
-                )
-            );
-
-        }
-
-    };
-
-
+    
     return (
-        <div className="relative min-h-screen bg-white pb-10">
-
-
-            {/* HEADER */}
+        <div className={'bg-white min-h-screen pb-10'}>
             <div className="sticky top-0 z-50 flex items-center justify-between w-full bg-black text-white p-5 px-10">
 
                 <div className="flex flex-col gap-2">
-
                     <div className="flex items-end gap-5">
                         <h1 className="font-bold text-xl">
                             Welcome Chef
                         </h1>
                         <SiCodechef className="size-10"/>
                     </div>
-
                     <h1 className="text-sm text-gray-400">
-                        Today: {
-                            new Date().toLocaleDateString(
-                                undefined,
+                        Today: {new Date().toLocaleDateString(undefined,
                                 {
                                     year:"numeric",
                                     month:"short",
@@ -143,71 +132,26 @@ export default function KDS() {
                     </h1>
 
                 </div>
-
                 <button
                     onClick={handle_logout}
-                    className="text-red-400 hover:underline"
+                    className="text-red-400 cursor-pointer hover:underline"
                 >
                     Logout
                 </button>
-
             </div>
-
-
-            {/* TITLE */}
-            <h1 className="my-5 text-2xl font-bold ml-5">
-                Kitchen Orders
-            </h1>
-
-
-            {/* TABS */}
-            <div className="flex mx-10">
-
-                <button
-                    onClick={() => setPage(0)}
-                    className={`w-full p-3 font-bold border cursor-pointer ${
-                        page === 0
-                            ? "bg-yellow-400"
-                            : "hover:bg-gray-200"
-                    }`}
-                >
-                    Pending
-                </button>
-
-                <button
-                    onClick={() => setPage(1)}
-                    className={`w-full p-3 font-bold border cursor-pointer ${
-                        page === 1
-                            ? "bg-yellow-400"
-                            : "hover:bg-gray-200"
-                    }`}
-                >
-                    Preparing
-                </button>
-
+            <h1 className="my-5 ml-5 text-2xl font-bold border-b">Today's Order Status</h1>
+            <div className="flex mx-10 text-center">
+                    <button className={`w-full text-2xl font-bold border p-3 rounded-l-full ${page===0?'bg-yellow-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(0)}>Pending</button>
+                    <button className={`w-full text-2xl font-bold border p-3 rounded-r-full ${page===1?'bg-blue-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(1)}>Preparing</button>
             </div>
-
-
-            {/* CONTENT */}
-            <div className="border mt-5 mx-10 min-h-[400px] rounded-lg p-5">
-
-                {loading ? (
-
-                    <div className="flex justify-center">
-                        <Loading2/>
-                    </div>
-
-                ) : filteredOrders.length === 0 ? (
-
-                    <p>No orders</p>
-
-                ) : (
-
-                    <div className="grid gird-cols-1 md:grid-cols-3 gap-5">
-
-                        {filteredOrders.map(order => (
-
-                            <div
+            
+            <div className="mx-10 border mt-5 h-100 rounded-lg p-3 overflow-y-auto">
+                {loading ? <div className={'flex items-center justify-center h-100'}><Loading2 /></div> : pages_order.length === 0 ? <p>No orders</p> : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                
+                        {
+                            pages_order.map(order => (
+                                <div
                                 key={order.id}
                                 className="border rounded-lg p-4 shadow"
                             >
@@ -224,6 +168,9 @@ export default function KDS() {
                                     Waiter: {order.waiter_name}
                                 </p>
 
+                                <p className="text-gray-500">
+                                    Time: {new Date(order.first_at).toLocaleString(undefined, {hour:"numeric", minute:"numeric", hour12:true})}
+                                </p>
 
                                 {/* ITEMS */}
                                 <div className="mt-3">
@@ -246,12 +193,12 @@ export default function KDS() {
 
                                         <button
                                             onClick={() =>
-                                                updateStatus(
+                                                handle_update(
                                                     order.id,
                                                     "preparing"
                                                 )
                                             }
-                                            className="bg-blue-500 text-white px-3 py-1 rounded"
+                                            className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer"
                                         >
                                             Start Preparing
                                         </button>
@@ -262,12 +209,12 @@ export default function KDS() {
 
                                         <button
                                             onClick={() =>
-                                                updateStatus(
+                                                handle_update(
                                                     order.id,
                                                     "done"
                                                 )
                                             }
-                                            className="bg-green-500 text-white px-3 py-1 rounded"
+                                            className="bg-green-500 text-white px-3 py-1 rounded cursor-pointer"
                                         >
                                             Done
                                         </button>
@@ -277,16 +224,16 @@ export default function KDS() {
                                 </div>
 
                             </div>
-
-                        ))}
-
+                            ))
+                        }
                     </div>
-
                 )}
-
             </div>
-
+            <AnimatePresence mode="wait">
+                { msg &&
+                    <Popup msg={msg.msg} type={msg.type ? msg.type : "success"} setMsg={setMsg}/>
+                }
+            </AnimatePresence>
         </div>
     );
-
 }
