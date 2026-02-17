@@ -7,12 +7,14 @@ import { socket } from "../../socket/sockt";
 import { AnimatePresence } from "framer-motion";
 import Popup from "../../components/Popup";
 import newOrderSound from "../../assets/sound/notification.wav"
+import { useNavigate } from "react-router-dom";
 
 
 export default function KDS() {
 
     const { logout } = useAuth();
     const { request } = useApi();
+    const navigate = useNavigate();
     // 0 pending, 1 preparing
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);

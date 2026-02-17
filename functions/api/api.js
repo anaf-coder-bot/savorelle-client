@@ -10,6 +10,7 @@ export const useApi = () => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${accessToken}`,
                 "ngrok-skip-browser-warning": "true",
+                "credentials":"include",
             };
             
             let response = await fetch(`${BACKEND}${endpoint}`, {headers, ...option});
