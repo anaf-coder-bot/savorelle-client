@@ -21,28 +21,67 @@ export default function KDS() {
     const [msg, setMsg] = useState(null);
     const [data, setData] = useState([]);
     const loadingRef = useRef(false);
+
+    // SOUND
     const audioRef = useRef(null);
+    const [soundEnabled, setSoundEnabled] = useState(false);
 
     useEffect(() => {
         get_orders();
     }, []);
 
+    // Initialize audio ONCE
     useEffect(() => {
         audioRef.current = new Audio(newOrderSound);
         audioRef.current.volume = 1;
+        audioRef.current.preload = "auto";
     }, []);
+
+    // Enable sound manually (required by browser)
+    const enableSound = () => {
+
+        if (!audioRef.current) return;
+
+        audioRef.current.play()
+            .then(() => {
+
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+
+                setSoundEnabled(true);
+
+            })
+            .catch(() => {});
+
+    };
+
 
     useEffect(() => {
         socket.connect();
         socket.emit("join-kitchen");
         
         socket.on("new-order", order => {
+
             setData(prev => [...prev, order]);
             setPage(0);
-            if (audioRef.current) {
-                audioRef.current.currentTime = 0;
-                audioRef.current.play().catch(() => {});
-            };
+
+            // PLAY SOUND
+            if (soundEnabled && audioRef.current) {
+
+                try {
+
+                    audioRef.current.currentTime = 0;
+
+                    const playPromise = audioRef.current.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {});
+                    }
+
+                } catch {}
+
+            }
+
         });
 
         socket.on("order-updated", updatedOrder => {
@@ -60,7 +99,9 @@ export default function KDS() {
             socket.off("order-updated");
             socket.disconnect();
         }
-    }, []);
+    }, [soundEnabled]);
+
+
 
     const get_orders = async () => {
         if (loading) return;
@@ -113,6 +154,18 @@ export default function KDS() {
     
     return (
         <div className={'bg-white min-h-screen pb-10'}>
+
+            {!soundEnabled && (
+                <div className="bg-yellow-300 p-3 text-center">
+                    <button
+                        onClick={enableSound}
+                        className="bg-black text-white px-4 py-2 rounded cursor-pointer"
+                    >
+                        🔊 Enable Kitchen Sound
+                    </button>
+                </div>
+            )}
+
             <div className="sticky top-0 z-50 flex items-center justify-between w-full bg-black text-white p-5 px-10">
 
                 <div className="flex flex-col gap-2">
@@ -141,10 +194,12 @@ export default function KDS() {
                     Logout
                 </button>
             </div>
+
             <h1 className="my-5 ml-5 text-2xl font-bold border-b">Today's Order Status</h1>
+
             <div className="flex mx-10 text-center">
-                    <button className={`w-full text-2xl font-bold border p-3 rounded-l-full ${page===0?'bg-yellow-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(0)}>Pending</button>
-                    <button className={`w-full text-2xl font-bold border p-3 rounded-r-full ${page===1?'bg-blue-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(1)}>Preparing</button>
+                <button className={`w-full text-2xl font-bold border p-3 rounded-l-full ${page===0?'bg-yellow-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(0)}>Pending</button>
+                <button className={`w-full text-2xl font-bold border p-3 rounded-r-full ${page===1?'bg-blue-400':'cursor-pointer hover:bg-gray-200'}`} onClick={() => !loading&&setPage(1)}>Preparing</button>
             </div>
             
             <div className="mx-10 border mt-5 h-100 rounded-lg p-3 overflow-y-auto">
@@ -174,7 +229,6 @@ export default function KDS() {
                                     Time: {new Date(order.first_at).toLocaleString(undefined, {hour:"numeric", minute:"numeric", hour12:true})}
                                 </p>
 
-                                {/* ITEMS */}
                                 <div className="mt-3">
 
                                     {order.items.map(item => (
@@ -187,8 +241,6 @@ export default function KDS() {
 
                                 </div>
 
-
-                                {/* BUTTON */}
                                 <div className="mt-4">
 
                                     {order.status === "pending" && (
@@ -228,14 +280,17 @@ export default function KDS() {
                             </div>
                             ))
                         }
+
                     </div>
                 )}
             </div>
+
             <AnimatePresence mode="wait">
                 { msg &&
                     <Popup msg={msg.msg} type={msg.type ? msg.type : "success"} setMsg={setMsg}/>
                 }
             </AnimatePresence>
+
         </div>
     );
 }
