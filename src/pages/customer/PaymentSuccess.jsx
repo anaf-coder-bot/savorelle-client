@@ -95,6 +95,7 @@ export default function PaymentSuccess() {
                                     <a href={data?.reciept} target="_blank">Click here to view</a>
                                 </div>
                             </div>
+                            
                             <h1 className="text-gray-400 text-center text-sm mt-5">We sent you an email of more details.</h1>
                             {round==='first' ? 
                                 <h1 className="text-gray-400 text-center text-sm">We will send you a link to pay the rest once your food is served via email.</h1> 

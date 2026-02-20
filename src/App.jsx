@@ -15,6 +15,7 @@ import CheckPayment from "./pages/customer/CheckPayment.jsx";
 import PaymentSuccess from "./pages/customer/PaymentSuccess.jsx";
 import PaymentFailed from "./pages/customer/PaymentFailed.jsx";
 import KDS from "./pages/kitchen/KDS.jsx";
+import PayRest from "./pages/customer/PayRest.jsx";
 
 export default function App() {
   return (
@@ -32,6 +33,8 @@ export default function App() {
           <Route path="/check-payment" element={<CheckPayment />}/>
           <Route path="/payment-success/:round" element={<PaymentSuccess />}/>
           <Route path="/payment-failed/:round" element={<PaymentFailed />}/>
+
+          <Route path="/pay-rest" element={<PayRest />}/>
 
           {/* MANAGER */}
           <Route path={"/manager"} element={
